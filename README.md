@@ -3,36 +3,30 @@ Remove one or more INFO fields from a VCF file.
 
 ## Installation/Requirements
 
-Python3 and the module 'parse_vcf' are required. To install the parse_vcf module run:
+Python3 and the modules 'parse_vcf' is required. The 'biopython' module is
+required to write BGZIP compressed output. To install via pip run:
 
     pip3 install parse_vcf
+    pip3 install biopython
 
 ## Usage
 
-    ./remove_info_fields.py VCF field1 [field2 ... fieldN]
+    usage: remove_info_fields.py [-h] -i VCF_INPUT [-o OUTPUT]
+                                 (-r REMOVE_FIELDS [REMOVE_FIELDS ...] | -k KEEP_FIELDS [KEEP_FIELDS ...])
 
-## Examples:
+    Remove specific INFO fields from a VCF file.
 
-Remove the three INFO fields 'controls_AC', 'controls_AF' and  'controls_AN' from the gnomad.genomes.r2.1.sites.vcf.bgz VCF:
-
-    ./remove_info_fields.py gnomad.genomes.r2.1.sites.vcf.bgz controls_AC controls_AF controls_AN
-
-All output is written to STDOUT - you will probably want to redirect to a file
-or pipe into bgzip.
-
-    ./remove_info_fields.py gnomad.genomes.r2.1.sites.vcf.bgz controls_AC controls_AF controls_AN \
-        | bgzip -c > output.vcf.gz
-
-
-Input can be from STDIN if '-' is given as the input file.
-
-    tabix -h gnomad.genomes.r2.1.sites.vcf.bgz 1:100000-200000 | \
-        ./remove_info_fields.py - controls_AC controls_AF controls_AN | \
-        bgzip -c > output.vcf.gz
-
-Remove all INFO fields with 'neuro', 'topmed' or 'controls' in their name from gnomad 2.1 VCFs:
-
-    ./remove_info_fields.py gnomad.genomes.r2.1.sites.vcf.bgz \
-        $(tabix -H gnomad.genomes.r2.1.sites.hg38_lift.vcf.bgz | grep INFO | \
-        grep -e neuro -e topmed -e controls  | cut -f 3 -d= | cut -f 1 -d,) \
-        | bgzip -c > gnomad.genomes.r2.1.sites.no_topmed_no_neuro_no_controls.vcf.gz
+    optional arguments:
+      -h, --help            show this help message and exit
+      -i VCF_INPUT, --vcf_input VCF_INPUT, --vcf VCF_INPUT
+                            Input VCF file
+      -o OUTPUT, --output OUTPUT
+                            Output VCF file. If the given filename ends with '.gz'
+                            or '.bgz' the output will be written compressed via
+                            BGZIP.
+      -r REMOVE_FIELDS [REMOVE_FIELDS ...], --remove_fields REMOVE_FIELDS [REMOVE_FIELDS ...]
+                            One or more INFO fields to remove.
+      -k KEEP_FIELDS [KEEP_FIELDS ...], --keep_fields KEEP_FIELDS [KEEP_FIELDS ...]
+                            One or more INFO fields to retain. All other INFO
+                            fields will be removed as long as they are defined in
+                            the VCF header.
