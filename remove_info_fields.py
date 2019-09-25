@@ -3,7 +3,6 @@ import sys
 import re
 import argparse
 from parse_vcf import VcfReader
-from Bio import bgzf
 
 info_re = re.compile(r"""\#\#INFO
                       =<ID=(\S+?)          #captures metadata ID
@@ -17,7 +16,8 @@ def get_options():
                         help='Input VCF file')
     parser.add_argument("-o", "--output", help='''Output VCF file. If the given
                         filename ends with '.gz' or '.bgz' the output will be
-                        written compressed via BGZIP.''')
+                        written compressed via BGZIP (required biopython
+                        module to be installed).''')
     keep_or_remove = parser.add_mutually_exclusive_group(required=True)
     keep_or_remove.add_argument('-r', '--remove_fields', nargs='+',
                                 help='One or more INFO fields to remove.')
@@ -55,6 +55,7 @@ def main(vcf_input, output, remove_fields=[], keep_fields=[]):
     if output is None:
         vcf_writer = sys.stdout
     elif output.endswith(('.gz', '.bgz')):
+        from Bio import bgzf
         vcf_writer = bgzf.BgzfWriter(output)
     else:
         vcf_writer = open(output, 'w')
